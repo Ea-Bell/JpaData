@@ -14,6 +14,8 @@ import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 import study.datajpa.entity.Team;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +31,8 @@ class MemberRepositoryTest {
     @Autowired MemberRepository memberRepository;
     @Autowired MemberJpaRepository memberJpaRepository;
     @Autowired TeamRepository teamRepository;
+    @PersistenceContext
+    EntityManager em;
 
 
     @Test
@@ -281,5 +285,46 @@ class MemberRepositoryTest {
         assertThat(page.hasNext()).isTrue();*/
     }
 
+    @Test
+    public void bulkUpdateJpa(){
+        //given
+        memberJpaRepository.save(new Member("member1", 10));
+        memberJpaRepository.save(new Member("member2", 15));
+        memberJpaRepository.save(new Member("member3", 19));
+        memberJpaRepository.save(new Member("member4", 20));
+        memberJpaRepository.save(new Member("member5", 21));
+        memberJpaRepository.save(new Member("member6", 40));
+
+        //when
+        int resultCount = memberJpaRepository.bulkAgePlus(20);
+
+        //then
+        assertThat(resultCount).isEqualTo(3);
     }
+
+    @Test
+    public void bulkUpdate(){
+        //given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 15));
+        memberRepository.save(new Member("member3", 19));
+        memberRepository.save(new Member("member4", 20));
+        memberRepository.save(new Member("member5", 21));
+        memberRepository.save(new Member("member6", 40));
+
+
+
+        //when
+        int resultCount = memberRepository.bulkAgePlus(20); //벌크 연산 메소드(JPA Data에서 자동으로 클리어 해주는 기능이 있음)
+        //기억하자 벌크 연산 후에는 반드시 영속성을 초기화하고 다시 데이터를 불러와야한다는것을..
+//        em.flush();
+//        em.clear();
+        List<Member> result = memberRepository.findByUsername("member5");
+        Member member5 = result.get(0);
+        System.out.println("member5 = " + member5);
+        //then
+        assertThat(resultCount).isEqualTo(3);
+    }
+
+}
 
