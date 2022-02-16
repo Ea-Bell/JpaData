@@ -312,8 +312,6 @@ class MemberRepositoryTest {
         memberRepository.save(new Member("member5", 21));
         memberRepository.save(new Member("member6", 40));
 
-
-
         //when
         int resultCount = memberRepository.bulkAgePlus(20); //벌크 연산 메소드(JPA Data에서 자동으로 클리어 해주는 기능이 있음)
         //기억하자 벌크 연산 후에는 반드시 영속성을 초기화하고 다시 데이터를 불러와야한다는것을..
@@ -326,5 +324,54 @@ class MemberRepositoryTest {
         assertThat(resultCount).isEqualTo(3);
     }
 
+    @Test
+    public void findMemberLazy(){
+        //given
+        //member1 -> teamA
+        //member2 -> teamB
+
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+
+        Member member1 = new Member("member1", 10, teamA);
+        Member member2 = new Member("member2", 10, teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        em.flush();
+        em.clear();
+
+//        //when  N+1발생
+//        List<Member> members = memberRepository.findAll();
+//        for (Member member : members) {
+//            System.out.println("member = " + member.getUsername());
+//            System.out.println("member.getTeam().getClass() = " + member.getTeam().getClass());
+//            System.out.println("member.getTeam().getName() = " + member.getTeam().getName());
+//        }
+        //when
+//        List<Member> members = memberRepository.findMemberFetchJoin();
+//        for (Member member : members) {
+//            System.out.println("member = " + member.getUsername());
+//            System.out.println("member.getTeam().getClass() = " + member.getTeam().getClass());
+//            System.out.println("member.getTeam().getName() = " + member.getTeam().getName());
+//        }
+//       //when
+//        List<Member> members = memberRepository.findAll();
+//        for (Member member : members) {
+//            System.out.println("member = " + member.getUsername());
+//            System.out.println("member.getTeam().getClass() = " + member.getTeam().getClass());
+//            System.out.println("member.getTeam().getName() = " + member.getTeam().getName());
+//        }
+
+        //when
+        List<Member> members = memberRepository.findEntityGraphByUsername("member1");
+        for (Member member : members) {
+            System.out.println("member = " + member.getUsername());
+            System.out.println("member.getTeam().getClass() = " + member.getTeam().getClass());
+            System.out.println("member.getTeam().getName() = " + member.getTeam().getName());
+        }
+    }
 }
 
