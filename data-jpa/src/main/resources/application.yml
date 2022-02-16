@@ -10,6 +10,7 @@ spring:
       ddl-auto: create
     properties:
       hibernate:
+#        dialect: org.hibernate.dialect.Oracle10gDialect      # DB따른 방언설정 해줘야함.
 #        show_sql: true
         format_sql: true
         default_batch_fetch_size: 100
