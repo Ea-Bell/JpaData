@@ -4,6 +4,10 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
@@ -218,6 +222,63 @@ class MemberRepositoryTest {
         //then
         assertThat(members.size()).isEqualTo(3);
         assertThat(totalCount).isEqualTo(5);
+    }
+
+    @Test
+    public void pagin(){
+
+            //given
+            memberRepository.save(new Member("member1", 10));
+            memberRepository.save(new Member("member2", 10));
+            memberRepository.save(new Member("member3", 10));
+            memberRepository.save(new Member("member4", 10));
+            memberRepository.save(new Member("member5", 10));
+
+        //페이지는 1부터가 아니라 0부터 시작이다.
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+
+            int age =10;
+            int offset=1; //현재 페이지
+            int limit=3;
+            //when
+        Page<Member> page = memberRepository.findByAge(age, pageRequest);
+
+        //stream map을 이용하여 dto변환
+        Page<MemberDto> toMap = page.map(member -> new MemberDto(member.getId(), member.getUsername(), null));
+
+
+        //페이지 계산 공식 적용 ...
+            // totalPage = totalCount/size ...
+            // 마지막페이지 ...
+            // 최초 페이지 ...
+
+            //then
+        //Page객체로 받아서 쓸때
+        List<Member> content = page.getContent();
+        long totalElements = page.getTotalElements();
+
+        for (Member member : content) {
+            System.out.println("member = " + member);
+        }
+        System.out.println("totalElements = " + totalElements);
+
+        assertThat(content.size()).isEqualTo(3);
+        assertThat(page.getTotalElements()).isEqualTo(5);
+        assertThat(page.getNumber()).isEqualTo(0);
+        assertThat(page.getTotalPages()).isEqualTo(2);
+        assertThat(page.isFirst()).isTrue();
+        assertThat(page.hasNext()).isTrue();
+
+
+        //Slice객체를 받아서 쓸때
+       /* List<Member> content = page.getContent();
+        assertThat(content.size()).isEqualTo(3);
+        //assertThat(page.getTotalElements()).isEqualTo(5);  //Slice 객체에서는 처리 안해줌
+        assertThat(page.getNumber()).isEqualTo(0);
+        //assertThat(page.getTotalPages()).isEqualTo(2);     //Slice 객체에서는 처리 안해줌
+        assertThat(page.isFirst()).isTrue();
+        assertThat(page.hasNext()).isTrue();*/
     }
 
     }
