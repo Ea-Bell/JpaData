@@ -17,7 +17,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
-    private final MemberRepository memberRepository;
+/*    private final MemberRepository memberRepository;
 
     @GetMapping("/members/{id}")
     public String findMember(@PathVariable("id") Long id){
@@ -42,5 +42,5 @@ public class MemberController {
         for (int i =0; i<100; i++){
             memberRepository.save(new Member("user"+i,i));
         }
-    }
+    }*/
 }

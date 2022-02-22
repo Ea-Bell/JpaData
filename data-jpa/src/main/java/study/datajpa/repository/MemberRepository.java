@@ -1,5 +1,6 @@
 package study.datajpa.repository;
 
+import org.apache.catalina.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -63,4 +64,7 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     //select  for update
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<Member> findLockByUsername(String username);
+
+    List<UsernameOnly> findProjectionsByUsername(@Param("username")String username);
 }
+
